@@ -237,6 +237,93 @@ class Product {
     }
   }
 
+  async getProductByPriceRange(req, res) {
+    let { minPrice, maxPrice } = req.body;
+    try {
+      let query = {};
+      let priceQuery = {};
+      if (minPrice !== undefined && minPrice !== null && minPrice !== "") {
+        priceQuery.$gte = parseFloat(minPrice);
+      }
+      if (maxPrice !== undefined && maxPrice !== null && maxPrice !== "") {
+        priceQuery.$lte = parseFloat(maxPrice);
+      }
+      if (Object.keys(priceQuery).length > 0) {
+        query.pPrice = priceQuery;
+      }
+      let products = await productModel
+        .find(query)
+        .populate("pCategory", "cName")
+        .sort({ pPrice: -1 });
+      if (products) {
+        return res.json({ Products: products });
+      }
+    } catch (err) {
+      return res.json({ error: "Filter product by price range wrong" });
+    }
+  }
+
+  async searchProducts(req, res) {
+    let { title, category } = req.body;
+    try {
+      let query = {};
+      if (title && title.trim() !== "") {
+        query.pName = { $regex: title, $options: "i" };
+      }
+      if (category && category.trim() !== "") {
+        query.pCategory = category;
+      }
+      let products = await productModel
+        .find(query)
+        .populate("pCategory", "_id cName")
+        .sort({ _id: -1 });
+      if (products) {
+        return res.json({ Products: products });
+      }
+    } catch (err) {
+      return res.json({ error: "Search product wrong" });
+    }
+  }
+
+  async searchAndFilterProducts(req, res) {
+    let { title, category, minPrice, maxPrice } = req.body;
+    try {
+      let query = {};
+      
+      // Search by title
+      if (title && title.trim() !== "") {
+        query.pName = { $regex: title, $options: "i" };
+      }
+      
+      // Search by category
+      if (category && category.trim() !== "") {
+        query.pCategory = category;
+      }
+      
+      // Filter by price range
+      let priceQuery = {};
+      if (minPrice !== undefined && minPrice !== null && minPrice !== "") {
+        priceQuery.$gte = parseFloat(minPrice);
+      }
+      if (maxPrice !== undefined && maxPrice !== null && maxPrice !== "") {
+        priceQuery.$lte = parseFloat(maxPrice);
+      }
+      if (Object.keys(priceQuery).length > 0) {
+        query.pPrice = priceQuery;
+      }
+      
+      let products = await productModel
+        .find(query)
+        .populate("pCategory", "_id cName")
+        .sort({ _id: -1 });
+      if (products) {
+        return res.json({ Products: products });
+      }
+    } catch (err) {
+      return res.json({ error: "Search and filter product wrong" });
+    }
+  }
+
   async getWishProduct(req, res) {
     let { productArray } = req.body;
     if (!productArray) {

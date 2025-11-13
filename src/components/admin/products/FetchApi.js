@@ -109,3 +109,41 @@ export const productByPrice = async (price) => {
     console.log(error);
   }
 };
+
+export const productByPriceRange = async (minPrice, maxPrice) => {
+  try {
+    let res = await axios.post(`${apiURL}/api/product/product-by-price-range`, {
+      minPrice,
+      maxPrice,
+    });
+    return res.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const searchProducts = async (title, category) => {
+  try {
+    let res = await axios.post(`${apiURL}/api/product/search-products`, {
+      title,
+      category,
+    });
+    return res.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const searchAndFilterProducts = async (title, category, minPrice, maxPrice) => {
+  try {
+    let res = await axios.post(`${apiURL}/api/product/search-and-filter-products`, {
+      title,
+      category,
+      minPrice,
+      maxPrice,
+    });
+    return res.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
